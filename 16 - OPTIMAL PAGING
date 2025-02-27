@@ -1,0 +1,74 @@
+#include &lt;stdio.h&gt;
+#define MAX_FRAMES 3 // Maximum number of frames
+// Function to check if a page is already in the frame
+int isPageInFrame(int frames[], int page) {
+for (int i = 0; i &lt; MAX_FRAMES; i++) {
+if (frames[i] == page) {
+return 1; // Page found
+}
+}
+return 0; // Page not found
+}
+// Function to find the optimal page to replace
+int findOptimal(int frames[], int pages[], int n, int currentIndex) {
+int farthest = currentIndex, pos = -1;
+for (int i = 0; i &lt; MAX_FRAMES; i++) {
+int j;
+for (j = currentIndex; j &lt; n; j++) {
+if (frames[i] == pages[j]) {
+if (j &gt; farthest) {
+farthest = j;
+pos = i; // Update position of the frame to replace
+}
+break;
+}
+}
+// If the page is not found in future references
+if (j == n) {
+return i; // Replace this page
+}
+}
+// If all pages are found in future references, replace the one that is farthest
+return (pos == -1) ? 0 : pos;
+}
+
+// Function to implement Optimal page replacement
+void optimalPageReplacement (int pages[], int n) {
+int frames[MAX_FRAMES] = {-1, -1, -1}; // Initialize frames
+int pageFaults = 0;
+printf(&quot;Page Reference String: &quot;);
+for (int i = 0; i &lt; n; i++) {
+printf(&quot;%d &quot;, pages[i]);
+}
+printf(&quot;\n&quot;);
+for (int i = 0; i &lt; n; i++) {
+// Check if the page is already in the frame
+if (!isPageInFrame(frames, pages[i])) {
+// Page fault occurs
+int replaceIndex = findOptimal(frames, pages, n, i + 1); // Find the optimal page to
+replace
+frames[replaceIndex] = pages[i]; // Replace the page
+pageFaults++;
+// Print current frame status
+printf(&quot;Page Fault! Current Frames: &quot;);
+for (int j = 0; j &lt; MAX_FRAMES; j++) {
+printf(&quot;%d &quot;, frames[j]);
+}
+printf(&quot;\n&quot;);
+} else {
+printf(&quot;Page %d is already in the frame. No Page Fault.\n&quot;, pages[i]);
+}
+}
+printf(&quot;Total Page Faults: %d\n&quot;, pageFaults);
+}
+int main() {
+int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3,0,3,2,1,2,0,1,7,0,1}; // Example page reference string
+int n = sizeof(pages) / sizeof(pages[0]);
+
+optimalPageReplacement(pages, n);
+return 0;
+}
+OUTPUT :
+Page reference string :7, 0, 1, 2, 0, 3, 0, 4, 2, 3,0,3,2,1,2,0,1,7,0,1
+Page Frame : 3
+Total Page Fault : 15
