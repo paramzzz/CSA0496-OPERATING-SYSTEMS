@@ -1,0 +1,71 @@
+#include &lt;stdio.h&gt;
+void roundRobin(int processes[], int n, int burst_time[], int quantum) {
+int remaining_time[n], waiting_time[n], turnaround_time[n];
+int total_wt = 0, total_tat = 0;
+int t = 0; // Current time
+for (int i = 0; i &lt; n; i++)
+remaining_time[i] = burst_time[i];
+while (1) {
+int done = 1;
+for (int i = 0; i &lt; n; i++) {
+if (remaining_time[i] &gt; 0) {
+done = 0; // There is still a pending process
+if (remaining_time[i] &gt; quantum) {
+t += quantum;
+remaining_time[i] -= quantum;
+} else {
+t += remaining_time[i];
+waiting_time[i] = t - burst_time[i];
+remaining_time[i] = 0;
+}
+}
+}
+if (done)
+break;
+}
+for (int i = 0; i &lt; n; i++)
+turnaround_time[i] = burst_time[i] + waiting_time[i];
+printf(&quot;\nProcess\tBurst Time\tWaiting Time\tTurnaround Time\n&quot;);
+for (int i = 0; i &lt; n; i++) {
+total_wt += waiting_time[i];
+total_tat += turnaround_time[i];
+printf(&quot;P%d\t%d\t\t%d\t\t%d\n&quot;, processes[i], burst_time[i], waiting_time[i],
+turnaround_time[i]);
+}
+printf(&quot;\nAverage Waiting Time: %.2f&quot;, (float)total_wt / n);
+printf(&quot;\nAverage Turnaround Time: %.2f\n&quot;, (float)total_tat / n);
+}
+int main() {
+int n, quantum;
+
+printf(&quot;Enter the number of processes: &quot;);
+scanf(&quot;%d&quot;, &amp;n);
+int processes[n], burst_time[n];
+printf(&quot;Enter the burst times of the processes:\n&quot;);
+for (int i = 0; i &lt; n; i++) {
+processes[i] = i + 1;
+printf(&quot;P%d: &quot;, i + 1);
+scanf(&quot;%d&quot;, &amp;burst_time[i]);
+}
+printf(&quot;Enter the time quantum: &quot;);
+scanf(&quot;%d&quot;, &amp;quantum);
+roundRobin(processes, n, burst_time, quantum);
+return 0;
+}
+input :
+enter the num of processor : 4
+enter the burst times of the processor :
+p1 : 8
+p2 : 5
+p3 : 4
+p4 : 3
+enter the time quantum : 3
+process    burst time    waiting time  turnaround time
+p1              8           12             20
+p2              5           17             17
+p3              4           14             18
+p4              9           12             12
+
+output:
+avg waiting time :11.75
+avg turnaround time : 16.75
